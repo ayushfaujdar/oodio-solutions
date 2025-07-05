@@ -1,0 +1,114 @@
+Design and code a **fully animated, premium-quality portfolio website** for my social media management agency called **“Oodio Solutions”**.
+
+✅ The website should have:
+- A **modern, elegant, glassmorphism + neon accent style**
+- **Smooth scroll animations**, **hover effects**, and **motion transitions** for buttons, images, and sections
+- Use **React.js + Tailwind CSS** for responsiveness and scalability (or clean HTML/CSS/JS if React is not available)
+- All text in **clean, minimalist fonts (e.g., Poppins, Inter, or Montserrat)**
+
+---
+
+🎯 **Homepage Layout & Taglines:**
+
+1. **Top Navbar:**
+   - Logo (Oodio Solutions)
+   - Navigation: Home | Services | Portfolio | Contact
+   - Sticky with smooth scroll
+
+2. **Hero Section (Full Screen):**
+   - Headline:  
+     “Where Brands Get Seen, Heard & Remembered.”
+   - Subtext:  
+     “Social Media Management that **speaks your story** & **grows your tribe**.”
+   - CTA Button: [Get Started] (Smooth hover effect)
+
+3. **What We Offer (Animated Cards with Fade/Slide Effects):**
+   - Title: **“What Oodio Can Offer”**
+   - Three columns/cards:
+     - **Phase 1:** Brand Discovery + Market Fit  
+       - Competitor analysis  
+       - TG profiling & positioning  
+       - Messaging framework
+     - **Phase 2:** Identity & Digital Infrastructure  
+       - Logo/Packaging  
+       - Instagram & LinkedIn branding  
+       - Reels, carousels, influencer marketing
+     - **Phase 3:** Launch Plan (30–60 days)  
+       - Paid ads strategy  
+       - Website launch  
+       - Influencer campaigns & PR
+
+4. **Our Portfolio (Dynamic Gallery Section):**
+   - Subsections with filters or tabs:
+     - **Video Editing**
+     - **Content Writing**
+     - **Thumbnail Designing**
+   - Showcase images/videos in **masonry or carousel gallery** (animated hover)
+   - All portfolio items should be **stored in a JSON or external file** so that **admin can add/update/delete portfolio items without touching the code.**
+
+---
+
+📩 **Contact Section:**
+- Stylish Contact Form:
+  - Name
+  - Email
+  - Message
+  - On submit → Email must be sent to: **codeayush7@gmail.com**
+- CTA: “Let’s Make Your Brand Unforgettable.”
+
+---
+
+🔒 **Admin Secret Portal (Hidden Command or Keyboard Shortcut):**
+- Implement a **hidden admin login page** triggered by:
+  - Typing a secret key combination (e.g., pressing `Ctrl + Shift + O`) OR
+  - Entering `/admin` in the URL
+- The **admin panel** should allow:
+  - Adding new portfolio items (upload images/videos/texts)
+  - Editing existing portfolio entries
+  - All without needing to modify any code manually
+
+---
+
+🌈 **Design & Animation Instructions:**
+- Use **Framer Motion or pure CSS animations** for scroll reveals and transitions
+- Add **parallax scrolling** on hero background
+- Buttons: soft shadows, animated hover gradients
+- Sections separated by **smooth curves or waves**
+
+---
+
+🛠 Tech & Platform Notes:
+- Must be **easy to run on Replit**
+- The site should be **editable via simple admin dashboard (no-code interface)** for portfolio updates
+- Ensure **mobile responsiveness**
+
+---
+
+🎨 Brand Feel:  
+- Luxury + Digital + Minimal
+- Colors: Black background with soft neon blues/purples or pastel gradients
+- Fonts: Minimalist + Geometric
+
+---
+
+🌟 Taglines you can use:
+- “We Make Brands Look Big.”
+- “Your Story. Our Strategy. Their Screens.”
+- “From Clicks to Connections.”
+
+---
+
+👉 **The final website must look like a polished agency site ready to impress high-ticket clients.**  
+👉 Ensure code modularity for easy updates and admin-friendly operation.
+
+---
+
+✅ Generate full responsive **code + CSS + animations**.  
+✅ If React is too heavy for Replit, generate in **HTML/CSS/JS with GSAP animations**.
+
+---
+
+---
+
+👉 If you want, I can also help you build the **exact admin panel idea and front-end** step by step.  
+Shall I generate the **exact code** for you right now too?
