@@ -2,12 +2,15 @@ import {
   users, 
   portfolioItems, 
   contactSubmissions,
+  categories,
   type User, 
   type InsertUser,
   type PortfolioItem,
   type InsertPortfolioItem,
   type ContactSubmission,
-  type InsertContactSubmission
+  type InsertContactSubmission,
+  type Category,
+  type InsertCategory
 } from "@shared/schema";
 
 export interface IStorage {
@@ -21,6 +24,10 @@ export interface IStorage {
   updatePortfolioItem(id: number, item: Partial<InsertPortfolioItem>): Promise<PortfolioItem | undefined>;
   deletePortfolioItem(id: number): Promise<boolean>;
   
+  getCategories(): Promise<Category[]>;
+  createCategory(category: InsertCategory): Promise<Category>;
+  deleteCategory(id: number): Promise<boolean>;
+  
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
   getContactSubmissions(): Promise<ContactSubmission[]>;
 }
@@ -29,20 +36,56 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private portfolioItems: Map<number, PortfolioItem>;
   private contactSubmissions: Map<number, ContactSubmission>;
+  private categories: Map<number, Category>;
   private currentUserId: number;
   private currentPortfolioId: number;
   private currentContactId: number;
+  private currentCategoryId: number;
 
   constructor() {
     this.users = new Map();
     this.portfolioItems = new Map();
     this.contactSubmissions = new Map();
+    this.categories = new Map();
     this.currentUserId = 1;
     this.currentPortfolioId = 1;
     this.currentContactId = 1;
+    this.currentCategoryId = 1;
     
-    // Initialize with sample portfolio items
+    // Initialize with default categories and sample portfolio items
+    this.initializeCategories();
     this.initializePortfolioItems();
+  }
+
+  private initializeCategories() {
+    const defaultCategories: Omit<Category, 'id'>[] = [
+      {
+        name: "video",
+        displayName: "Video Editing",
+        color: "cyan",
+        createdAt: new Date(),
+      },
+      {
+        name: "content",
+        displayName: "Content Writing",
+        color: "purple",
+        createdAt: new Date(),
+      },
+      {
+        name: "design",
+        displayName: "Thumbnail Design",
+        color: "blue",
+        createdAt: new Date(),
+      }
+    ];
+
+    defaultCategories.forEach(category => {
+      const categoryItem: Category = {
+        id: this.currentCategoryId++,
+        ...category,
+      };
+      this.categories.set(categoryItem.id, categoryItem);
+    });
   }
 
   private initializePortfolioItems() {
@@ -171,6 +214,29 @@ export class MemStorage implements IStorage {
     return Array.from(this.contactSubmissions.values()).sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+  }
+
+  async getCategories(): Promise<Category[]> {
+    return Array.from(this.categories.values()).sort((a, b) => 
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }
+
+  async createCategory(insertCategory: InsertCategory): Promise<Category> {
+    const id = this.currentCategoryId++;
+    const category: Category = {
+      id,
+      name: insertCategory.name,
+      displayName: insertCategory.displayName,
+      color: insertCategory.color || "blue",
+      createdAt: new Date(),
+    };
+    this.categories.set(id, category);
+    return category;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    return this.categories.delete(id);
   }
 }
 
