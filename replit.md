@@ -131,8 +131,6 @@ This is a modern, fully-animated portfolio website for Oodio Solutions, a social
 
 ```
 Changelog:
-- July 06, 2025. Enhanced admin panel with tabbed interface for portfolio, categories, and file upload management
-- July 06, 2025. Updated contact form email recipient to oodio.solutions@gmail.com
 - July 05, 2025. Initial setup
 ```
 

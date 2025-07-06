@@ -200,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         await transporter.sendMail({
           from: process.env.EMAIL_USER || 'your-email@gmail.com',
-          to: 'oodio.solutions@gmail.com',
+          to: 'codeayush7@gmail.com',
           subject: `New Contact Form Submission - ${validatedData.name}`,
           text: `
             Name: ${validatedData.name}
