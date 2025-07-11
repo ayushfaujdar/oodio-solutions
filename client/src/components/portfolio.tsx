@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePortfolio } from "@/hooks/use-portfolio";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { PlayCircle } from "lucide-react";
 
 const categories = [
   { id: "all", label: "All Work" },
@@ -90,6 +91,7 @@ export default function Portfolio() {
             <AnimatePresence>
               {filteredItems.map((item) => {
                 const color = getCategoryColor(item.category);
+                const isVideo = /\.(mp4|mov|avi)$/i.test(item.image);
                 return (
                   <motion.div
                     key={`${item.id}-${activeFilter}`}
@@ -105,11 +107,26 @@ export default function Portfolio() {
                       onClick={() => handleItemClick(item)}
                     >
                       <div className="relative overflow-hidden">
-                        <img 
-                          src={item.image} 
-                          alt={item.title}
-                          className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
+                        {isVideo ? (
+                          <>
+                            <video
+                              src={item.image}
+                              className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110 bg-black"
+                              controls={false}
+                              muted
+                              preload="metadata"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <PlayCircle size={64} className="text-white/80 drop-shadow-lg" />
+                            </div>
+                          </>
+                        ) : (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        )}
                         <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
                       </div>
                       <div className="p-6">
