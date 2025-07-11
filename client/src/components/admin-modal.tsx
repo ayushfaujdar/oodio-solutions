@@ -398,7 +398,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {categories?.map((category: Category) => (
+                                    {(Array.isArray(categories) ? categories : []).map((category: Category) => (
                                       <SelectItem key={category.id} value={category.name}>
                                         {category.displayName}
                                       </SelectItem>
@@ -420,11 +420,23 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                                   <div className="space-y-2">
                                     {uploadedImageUrl ? (
                                       <div className="relative">
-                                        <img 
-                                          src={uploadedImageUrl} 
-                                          alt="Uploaded" 
-                                          className="w-full h-32 object-cover rounded-lg border border-white/20"
-                                        />
+                                        {uploadedImageUrl.match(/\.(mp4|mov|avi)$/i) ? (
+                                          <a href={uploadedImageUrl} target="_blank" rel="noopener noreferrer">
+                                            <video
+                                              src={uploadedImageUrl}
+                                              className="w-full h-32 object-cover rounded-lg border border-white/20 cursor-pointer"
+                                              controls
+                                            />
+                                          </a>
+                                        ) : (
+                                          <a href={uploadedImageUrl} target="_blank" rel="noopener noreferrer">
+                                            <img
+                                              src={uploadedImageUrl}
+                                              alt="Uploaded"
+                                              className="w-full h-32 object-cover rounded-lg border border-white/20 cursor-pointer"
+                                            />
+                                          </a>
+                                        )}
                                         <Button
                                           type="button"
                                           variant="destructive"
@@ -472,10 +484,10 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
                             <p className="mt-2 text-gray-400">Loading portfolio items...</p>
                           </div>
-                        ) : portfolioItems?.length === 0 ? (
+                        ) : (Array.isArray(portfolioItems) ? portfolioItems.length === 0 : true) ? (
                           <p className="text-gray-400 text-center py-8">No portfolio items found.</p>
                         ) : (
-                          portfolioItems?.map((item: PortfolioItem) => (
+                          (Array.isArray(portfolioItems) ? portfolioItems : []).map((item: PortfolioItem) => (
                             <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex justify-between items-center">
                               <div className="flex-1">
                                 <h4 className="font-semibold text-cyan-400">{item.title}</h4>
@@ -589,10 +601,10 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
                             <p className="mt-2 text-gray-400">Loading categories...</p>
                           </div>
-                        ) : categories?.length === 0 ? (
+                        ) : (Array.isArray(categories) ? categories.length === 0 : true) ? (
                           <p className="text-gray-400 text-center py-8">No categories found.</p>
                         ) : (
-                          categories?.map((category: Category) => (
+                          (Array.isArray(categories) ? categories : []).map((category: Category) => (
                             <div key={category.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex justify-between items-center">
                               <div className="flex-1">
                                 <h4 className="font-semibold text-purple-400">{category.displayName}</h4>
@@ -630,42 +642,35 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                         className="hidden"
                       />
                       
-                      {uploadedImageUrl ? (
-                        <div className="space-y-4">
-                          <img 
-                            src={uploadedImageUrl} 
-                            alt="Uploaded" 
-                            className="max-w-full h-48 object-cover rounded-lg mx-auto border border-white/20"
-                          />
-                          <p className="text-green-400 font-medium">File uploaded successfully!</p>
-                          <p className="text-sm text-gray-400">URL: {uploadedImageUrl}</p>
-                          <Button
-                            onClick={() => {
-                              setUploadedImageUrl("");
-                              if (fileInputRef.current) fileInputRef.current.value = "";
-                            }}
-                            variant="outline"
-                            className="border-white/20"
-                          >
-                            Upload Another File
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <Upload size={48} className="mx-auto text-gray-400" />
-                          <div>
-                            <h4 className="text-lg font-medium mb-2">Drop files here or click to upload</h4>
-                            <p className="text-gray-400 mb-4">Supports images and videos (no enforced size limit)</p>
-                            <Button
-                              onClick={() => fileInputRef.current?.click()}
-                              disabled={isUploading}
-                              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-                            >
-                              {isUploading ? "Uploading..." : "Choose Files"}
-                            </Button>
-                          </div>
-                        </div>
+                      {uploadedImageUrl && (
+                        <a href={uploadedImageUrl} target="_blank" rel="noopener noreferrer">
+                          {uploadedImageUrl.match(/\.(mp4|mov|avi)$/i) ? (
+                            <video
+                              src={uploadedImageUrl}
+                              className="max-w-full h-48 object-cover rounded-lg mx-auto border border-white/20 cursor-pointer"
+                              controls
+                            />
+                          ) : (
+                            <img
+                              src={uploadedImageUrl}
+                              alt="Uploaded"
+                              className="max-w-full h-48 object-cover rounded-lg mx-auto border border-white/20 cursor-pointer"
+                            />
+                          )}
+                        </a>
                       )}
+                      
+                      <div>
+                        <h4 className="text-lg font-medium mb-2">Drop files here or click to upload</h4>
+                        <p className="text-gray-400 mb-4">Supports images and videos (no enforced size limit)</p>
+                        <Button
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                          className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                        >
+                          {isUploading ? "Uploading..." : "Choose Files"}
+                        </Button>
+                      </div>
                     </div>
                     
                     <p className="text-sm text-gray-500">
