@@ -38,7 +38,8 @@ const upload = multer({
     } else {
       cb(new Error('Only image and video files are allowed'));
     }
-  }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 * 1024 * 1024 } // 10TB
 });
 
 // Admin password - in production, use proper authentication

@@ -655,7 +655,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                           <Upload size={48} className="mx-auto text-gray-400" />
                           <div>
                             <h4 className="text-lg font-medium mb-2">Drop files here or click to upload</h4>
-                            <p className="text-gray-400 mb-4">Supports images and videos (max 10MB)</p>
+                            <p className="text-gray-400 mb-4">Supports images and videos (no enforced size limit)</p>
                             <Button
                               onClick={() => fileInputRef.current?.click()}
                               disabled={isUploading}
