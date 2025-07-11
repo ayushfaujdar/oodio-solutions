@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { usePortfolio } from "@/hooks/use-portfolio";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 
 const categories = [
   { id: "all", label: "All Work" },
@@ -14,6 +15,8 @@ const categories = [
 export default function Portfolio() {
   const [activeFilter, setActiveFilter] = useState("all");
   const { data: portfolioItems, isLoading } = usePortfolio();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState<{ url: string; type: "image" | "video"; title: string } | null>(null);
 
   const filteredItems = portfolioItems?.filter(item => 
     activeFilter === "all" || item.category === activeFilter
@@ -26,6 +29,16 @@ export default function Portfolio() {
       case "design": return "blue";
       default: return "gray";
     }
+  };
+
+  const handleItemClick = (item: any) => {
+    const isVideo = /\.(mp4|mov|avi)$/i.test(item.image);
+    setModalContent({
+      url: item.image,
+      type: isVideo ? "video" : "image",
+      title: item.title
+    });
+    setModalOpen(true);
   };
 
   return (
@@ -87,7 +100,10 @@ export default function Portfolio() {
                     transition={{ duration: 0.5 }}
                     layout
                   >
-                    <div className={`glass-effect glass-hover rounded-3xl overflow-hidden border-2 border-transparent hover:border-${color}-400/30 hover:shadow-2xl hover:shadow-${color}-500/20 transition-all duration-500`}>
+                    <div
+                      className={`glass-effect glass-hover rounded-3xl overflow-hidden border-2 border-transparent hover:border-${color}-400/30 hover:shadow-2xl hover:shadow-${color}-500/20 transition-all duration-500 cursor-pointer`}
+                      onClick={() => handleItemClick(item)}
+                    >
                       <div className="relative overflow-hidden">
                         <img 
                           src={item.image} 
@@ -115,6 +131,20 @@ export default function Portfolio() {
           )}
         </div>
       </div>
+      {/* Modal/Lightbox */}
+      {modalOpen && modalContent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setModalOpen(false)}>
+          <div className="relative max-w-3xl w-full p-4" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-white text-2xl" onClick={() => setModalOpen(false)}>&times;</button>
+            {modalContent.type === "video" ? (
+              <video src={modalContent.url} controls autoPlay className="w-full max-h-[70vh] rounded-lg bg-black" />
+            ) : (
+              <img src={modalContent.url} alt={modalContent.title} className="w-full max-h-[70vh] object-contain rounded-lg bg-black" />
+            )}
+            <div className="mt-2 text-center text-white text-lg font-semibold">{modalContent.title}</div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
