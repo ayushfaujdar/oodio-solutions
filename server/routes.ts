@@ -8,6 +8,13 @@ import nodemailer from "nodemailer";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: "do4bc9bdd",
+  api_key: "156694195619632",
+  api_secret: "0kKzlLSbhb182zpMfLzyE6NeDYw"
+});
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -60,14 +67,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/uploads', express.static(uploadsDir));
   
   // File upload endpoint
-  app.post('/api/upload', upload.single('file'), (req, res) => {
+  app.post('/api/upload', upload.single('file'), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
       }
-      
-      const fileUrl = `/uploads/${req.file.filename}`;
-      res.json({ 
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: "auto"
+      });
+
+      const fileUrl = result.secure_url;
+      res.json({
         message: 'File uploaded successfully',
         filename: req.file.filename,
         url: fileUrl,
@@ -76,7 +88,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error uploading file:', error);
-      res.status(500).json({ message: 'Failed to upload file' });
+      const errorMessage = typeof error === 'object' && error && 'message' in error ? (error as any).message : 'Unknown error';
+      res.status(500).json({ message: 'Failed to upload file', error: errorMessage });
     }
   });
 
