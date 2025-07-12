@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    .file-list { margin-top: 2rem; }
+    .file-item { margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
+    img, video { max-width: 100%; max-height: 200px; display: block; margin-top: 0.5rem; }
+    video { background: #000; }
+  </style>
+</head>
+<body>
+  <h1>File Upload Demo</h1>
+  <form id="uploadForm">
+    <input type="file" id="fileInput" name="file" required />
+    <button type="submit">Upload</button>
+  </form>
+  <div class="file-list" id="fileList"></div>
+  <script>
+    async function fetchFiles() {
+      const res = await fetch('/files');
+      const files = await res.json();
+      const list = document.getElementById('fileList');
+      list.innerHTML = '';
+      files.forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.innerHTML = `<strong>${file.filename}</strong><br/>`;
+        if (file.url.match(/\.(mp4|mov|avi)$/i)) {
+          div.innerHTML += `<video src="${file.url}" controls></video>`;
+        } else {
+          div.innerHTML += `<img src="${file.url}" alt="${file.filename}" />`;
+        }
+        div.innerHTML += `<div><small>Uploaded: ${new Date(file.uploadedAt).toLocaleString()}</small></div>`;
+        list.appendChild(div);
+      });
+    }
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      const res = await fetch('/upload', { method: 'POST', body: formData });
+      if (res.ok) {
+        fileInput.value = '';
+        await fetchFiles();
+      } else {
+        alert('Upload failed');
+      }
+    });
+    fetchFiles();
+  </script>
+</body>
+</html> 
