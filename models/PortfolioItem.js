@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const portfolioItemSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -8,4 +8,5 @@ const portfolioItemSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('PortfolioItem', portfolioItemSchema); 
+const PortfolioItem = mongoose.model('PortfolioItem', portfolioItemSchema);
+export default PortfolioItem; 
