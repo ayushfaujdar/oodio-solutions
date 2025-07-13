@@ -13,6 +13,10 @@ import {
   type InsertCategory
 } from "@shared/schema";
 
+const PortfolioItem = require('../models/PortfolioItem.js');
+const Category = require('../models/Category.js');
+const ContactSubmission = require('../models/ContactSubmission.js');
+
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -32,212 +36,58 @@ export interface IStorage {
   getContactSubmissions(): Promise<ContactSubmission[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private portfolioItems: Map<number, PortfolioItem>;
-  private contactSubmissions: Map<number, ContactSubmission>;
-  private categories: Map<number, Category>;
-  private currentUserId: number;
-  private currentPortfolioId: number;
-  private currentContactId: number;
-  private currentCategoryId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.portfolioItems = new Map();
-    this.contactSubmissions = new Map();
-    this.categories = new Map();
-    this.currentUserId = 1;
-    this.currentPortfolioId = 1;
-    this.currentContactId = 1;
-    this.currentCategoryId = 1;
-    
-    // Initialize with default categories and sample portfolio items
-    this.initializeCategories();
-    this.initializePortfolioItems();
-  }
-
-  private initializeCategories() {
-    const defaultCategories: Omit<Category, 'id'>[] = [
-      {
-        name: "video",
-        displayName: "Video Editing",
-        color: "cyan",
-        createdAt: new Date(),
-      },
-      {
-        name: "content",
-        displayName: "Content Writing",
-        color: "purple",
-        createdAt: new Date(),
-      },
-      {
-        name: "design",
-        displayName: "Thumbnail Design",
-        color: "blue",
-        createdAt: new Date(),
-      }
-    ];
-
-    defaultCategories.forEach(category => {
-      const categoryItem: Category = {
-        id: this.currentCategoryId++,
-        ...category,
-      };
-      this.categories.set(categoryItem.id, categoryItem);
-    });
-  }
-
-  private initializePortfolioItems() {
-    const sampleItems: Omit<PortfolioItem, 'id'>[] = [
-      {
-        title: "Brand Story Video",
-        description: "Cinematic brand storytelling for luxury fashion brand",
-        category: "video",
-        image: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600",
-        createdAt: new Date(),
-      },
-      {
-        title: "Social Media Reels",
-        description: "Viral-ready content for Instagram and TikTok",
-        category: "video",
-        image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600",
-        createdAt: new Date(),
-      },
-      {
-        title: "Brand Messaging",
-        description: "Strategic content framework for B2B SaaS startup",
-        category: "content",
-        image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600",
-        createdAt: new Date(),
-      },
-      {
-        title: "Content Strategy",
-        description: "360-degree content plan for e-commerce brand",
-        category: "content",
-        image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600",
-        createdAt: new Date(),
-      },
-      {
-        title: "YouTube Thumbnails",
-        description: "High-CTR thumbnail designs for tech channel",
-        category: "design",
-        image: "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600",
-        createdAt: new Date(),
-      },
-      {
-        title: "Social Media Graphics",
-        description: "Brand-consistent visual assets for social platforms",
-        category: "design",
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600",
-        createdAt: new Date(),
-      },
-    ];
-
-    sampleItems.forEach(item => {
-      const portfolioItem: PortfolioItem = {
-        id: this.currentPortfolioId++,
-        ...item,
-      };
-      this.portfolioItems.set(portfolioItem.id, portfolioItem);
-    });
-  }
-
+class MongoDBStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    return undefined; // User methods are not implemented (not used in current app)
   }
-
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    return undefined; // User methods are not implemented (not used in current app)
   }
-
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+    return undefined; // User methods are not implemented (not used in current app)
   }
 
   async getPortfolioItems(): Promise<PortfolioItem[]> {
-    return Array.from(this.portfolioItems.values()).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return await PortfolioItem.find().sort({ createdAt: -1 });
   }
 
   async getPortfolioItemsByCategory(category: string): Promise<PortfolioItem[]> {
-    return Array.from(this.portfolioItems.values())
-      .filter(item => item.category === category)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await PortfolioItem.find({ category }).sort({ createdAt: -1 });
   }
 
   async createPortfolioItem(insertItem: InsertPortfolioItem): Promise<PortfolioItem> {
-    const id = this.currentPortfolioId++;
-    const item: PortfolioItem = {
-      ...insertItem,
-      id,
-      createdAt: new Date(),
-    };
-    this.portfolioItems.set(id, item);
-    return item;
+    return await PortfolioItem.create(insertItem);
   }
 
   async updatePortfolioItem(id: number, updates: Partial<InsertPortfolioItem>): Promise<PortfolioItem | undefined> {
-    const existingItem = this.portfolioItems.get(id);
-    if (!existingItem) return undefined;
-
-    const updatedItem: PortfolioItem = {
-      ...existingItem,
-      ...updates,
-    };
-    this.portfolioItems.set(id, updatedItem);
-    return updatedItem;
+    return await PortfolioItem.findByIdAndUpdate(id, updates, { new: true });
   }
 
   async deletePortfolioItem(id: number): Promise<boolean> {
-    return this.portfolioItems.delete(id);
+    const res = await PortfolioItem.findByIdAndDelete(id);
+    return !!res;
   }
 
   async createContactSubmission(insertSubmission: InsertContactSubmission): Promise<ContactSubmission> {
-    const id = this.currentContactId++;
-    const submission: ContactSubmission = {
-      ...insertSubmission,
-      id,
-      createdAt: new Date(),
-    };
-    this.contactSubmissions.set(id, submission);
-    return submission;
+    return await ContactSubmission.create(insertSubmission);
   }
 
   async getContactSubmissions(): Promise<ContactSubmission[]> {
-    return Array.from(this.contactSubmissions.values()).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return await ContactSubmission.find().sort({ createdAt: -1 });
   }
 
   async getCategories(): Promise<Category[]> {
-    return Array.from(this.categories.values()).sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
+    return await Category.find().sort({ createdAt: -1 });
   }
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
-    const id = this.currentCategoryId++;
-    const category: Category = {
-      id,
-      name: insertCategory.name,
-      displayName: insertCategory.displayName,
-      color: insertCategory.color || "blue",
-      createdAt: new Date(),
-    };
-    this.categories.set(id, category);
-    return category;
+    return await Category.create(insertCategory);
   }
 
   async deleteCategory(id: number): Promise<boolean> {
-    return this.categories.delete(id);
+    const res = await Category.findByIdAndDelete(id);
+    return !!res;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new MongoDBStorage();
