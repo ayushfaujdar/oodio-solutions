@@ -7,10 +7,10 @@ import { Dialog } from "@/components/ui/dialog";
 import { PlayCircle } from "lucide-react";
 
 const categories = [
-  { id: "all", label: "All Work", color: "bg-gradient-to-r from-cyan-400 to-purple-600" },
-  { id: "video", label: "Video Editing", color: "bg-gradient-to-r from-cyan-400 to-blue-500" },
-  { id: "content", label: "Content Writing", color: "bg-gradient-to-r from-purple-400 to-pink-500" },
-  { id: "design", label: "Thumbnail Design", color: "bg-gradient-to-r from-blue-400 to-cyan-500" }
+  { id: "all", label: "All Work" },
+  { id: "video", label: "Video Editing" },
+  { id: "content", label: "Content Writing" },
+  { id: "design", label: "Thumbnail Design" }
 ];
 
 export default function Portfolio() {
@@ -52,10 +52,10 @@ export default function Portfolio() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text">
             Our Portfolio
           </h2>
-          <p className="text-xl bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent">
+          <p className="text-xl text-gray-300">
             Showcasing our expertise across different creative domains
           </p>
         </motion.div>
@@ -68,8 +68,8 @@ export default function Portfolio() {
               onClick={() => setActiveFilter(category.id)}
               className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
                 activeFilter === category.id
-                  ? category.color + " text-white shadow-lg shadow-cyan-500/30"
-                  : "bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                  ? "btn-gradient"
+                  : "glass-effect glass-hover"
               }`}
             >
               {category.label}
@@ -96,7 +96,7 @@ export default function Portfolio() {
                 return (
                   <motion.div
                     key={`${item.id}-${activeFilter}`}
-                    className="portfolio-item group"
+                    className="portfolio-item"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
@@ -104,7 +104,7 @@ export default function Portfolio() {
                     layout
                   >
                     <div
-                      className="bg-white/5 backdrop-blur-md rounded-3xl overflow-hidden border-2 border-white/10 hover:border-cyan-400/30 hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-500 cursor-pointer"
+                      className="glass-effect glass-hover rounded-3xl overflow-hidden cursor-pointer transition-all duration-300"
                       onClick={() => handleItemClick(item)}
                     >
                       <div className="relative overflow-hidden">
@@ -118,7 +118,7 @@ export default function Portfolio() {
                               preload="metadata"
                             />
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                              <PlayCircle size={64} className="text-white/80 drop-shadow-lg" />
+                              <PlayCircle size={64} className="text-white/80" />
                             </div>
                           </>
                         ) : (
@@ -131,14 +131,14 @@ export default function Portfolio() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
                       <div className="p-6">
-                        <h3 className={`text-xl font-bold mb-3 bg-gradient-to-r from-${color}-400 to-${color}-600 bg-clip-text text-transparent`}>
+                        <h3 className="text-xl font-bold mb-3 neon-text">
                           {item.title}
                         </h3>
                         <p className="text-gray-300 text-sm leading-relaxed">
                           {item.description}
                         </p>
-                        <div className={`mt-4 inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-${color}-500/20 to-${color}-600/20 border border-${color}-400/30`}>
-                          <span className={`bg-gradient-to-r from-${color}-400 to-${color}-600 bg-clip-text text-transparent text-xs font-medium`}>
+                        <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full glass-effect">
+                          <span className="text-xs font-medium text-cyan-400">
                             {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
                           </span>
                         </div>
