@@ -113,8 +113,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error creating category:', error);
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: 'Invalid data', errors: error.errors });
+      } else if (typeof error === 'object' && error !== null && 'code' in error && (error as any).code === 11000) { // MongoDB duplicate key error
+        res.status(400).json({ message: 'Category name already exists.' });
       } else {
-        res.status(500).json({ message: 'Failed to create category' });
+        const errorMessage = typeof error === 'object' && error && 'message' in error ? (error as any).message : 'Unknown error';
+        res.status(500).json({ message: 'Failed to create category', error: errorMessage });
       }
     }
   });
