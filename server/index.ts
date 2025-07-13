@@ -1,6 +1,18 @@
+import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import mongoose from 'mongoose';
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI as string)
+  .then(() => {
+    log('✅ MongoDB Connected Successfully');
+  })
+  .catch(err => {
+    log('❌ MongoDB Connection Error:', err);
+    process.exit(1);  // Exit if cannot connect to database
+  });
 
 const app = express();
 app.use(express.json());
