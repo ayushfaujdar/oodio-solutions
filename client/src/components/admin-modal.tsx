@@ -74,13 +74,19 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
   });
 
   const { data: portfolioItems, isLoading } = useQuery({
-    queryKey: ["/api/portfolio"],
-    enabled: isAuthenticated
+    queryKey: ['/api/portfolio'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/portfolio');
+      return response;
+    }
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery({
-    queryKey: ["/api/categories"],
-    enabled: isAuthenticated
+    queryKey: ['/api/categories'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/categories');
+      return response;
+    }
   });
 
   const loginMutation = useMutation({
@@ -129,8 +135,16 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
   });
 
   const deletePortfolioMutation = useMutation({
-    mutationFn: async (id: string | number) => {
-      await apiRequest("DELETE", `/api/portfolio/${id}`);
+    mutationFn: async (id: string) => {
+      try {
+        const response = await apiRequest("DELETE", `/api/portfolio/${id}`);
+        return await response.json();
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error('Failed to delete portfolio item');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] });
@@ -139,7 +153,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         description: "The portfolio item has been removed successfully.",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error deleting portfolio item",
         description: error.message,
@@ -170,8 +184,16 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
   });
 
   const deleteCategoryMutation = useMutation({
-    mutationFn: async (id: string | number) => {
-      await apiRequest("DELETE", `/api/categories/${id}`);
+    mutationFn: async (id: string) => {
+      try {
+        const response = await apiRequest("DELETE", `/api/categories/${id}`);
+        return await response.json();
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error('Failed to delete category');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
@@ -180,7 +202,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         description: "The category has been removed successfully.",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error deleting category",
         description: error.message,
@@ -233,7 +255,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     addPortfolioMutation.mutate(data);
   };
 
-  const handleDeletePortfolio = (id: number) => {
+  const handleDeletePortfolio = (id: string) => {
     if (confirm("Are you sure you want to delete this portfolio item?")) {
       deletePortfolioMutation.mutate(id);
     }
@@ -243,7 +265,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     addCategoryMutation.mutate(data);
   };
 
-  const handleDeleteCategory = (id: number) => {
+  const handleDeleteCategory = (id: string) => {
     if (confirm("Are you sure you want to delete this category?")) {
       deleteCategoryMutation.mutate(id);
     }
@@ -399,7 +421,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                                   </FormControl>
                                   <SelectContent>
                                     {(Array.isArray(categories) ? categories : []).map((category: Category) => (
-                                      <SelectItem key={category.id} value={category.name}>
+                                      <SelectItem key={category._id} value={category.name}>
                                         {category.displayName}
                                       </SelectItem>
                                     ))}
@@ -488,13 +510,13 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                           <p className="text-gray-400 text-center py-8">No portfolio items found.</p>
                         ) : (
                           (Array.isArray(portfolioItems) ? portfolioItems : []).map((item: PortfolioItem) => (
-                            <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex justify-between items-center">
+                            <div key={item._id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex justify-between items-center">
                               <div className="flex-1">
                                 <h4 className="font-semibold text-cyan-400">{item.title}</h4>
                                 <p className="text-sm text-gray-400 capitalize">{item.category}</p>
                               </div>
                               <Button
-                                onClick={() => handleDeletePortfolio(item.id)}
+                                onClick={() => handleDeletePortfolio(item._id)}
                                 disabled={deletePortfolioMutation.isPending}
                                 variant="destructive"
                                 size="sm"
@@ -605,13 +627,13 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                           <p className="text-gray-400 text-center py-8">No categories found.</p>
                         ) : (
                           (Array.isArray(categories) ? categories : []).map((category: Category) => (
-                            <div key={category.id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex justify-between items-center">
+                            <div key={category._id} className="bg-white/5 border border-white/10 rounded-lg p-4 flex justify-between items-center">
                               <div className="flex-1">
                                 <h4 className="font-semibold text-purple-400">{category.displayName}</h4>
                                 <p className="text-sm text-gray-400">{category.name} • {category.color}</p>
                               </div>
                               <Button
-                                onClick={() => handleDeleteCategory(category.id)}
+                                onClick={() => handleDeleteCategory(category._id)}
                                 disabled={deleteCategoryMutation.isPending}
                                 variant="destructive"
                                 size="sm"
