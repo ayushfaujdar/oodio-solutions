@@ -77,7 +77,8 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     queryKey: ['/api/portfolio'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/portfolio');
-      return response;
+      const data = await response.json();
+      return data;
     }
   });
 
@@ -85,7 +86,8 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     queryKey: ['/api/categories'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/categories');
-      return response;
+      const data = await response.json();
+      return data;
     }
   });
 
