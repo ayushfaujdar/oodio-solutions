@@ -129,7 +129,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
   });
 
   const deletePortfolioMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string | number) => {
       await apiRequest("DELETE", `/api/portfolio/${id}`);
     },
     onSuccess: () => {
@@ -170,7 +170,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
   });
 
   const deleteCategoryMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string | number) => {
       await apiRequest("DELETE", `/api/categories/${id}`);
     },
     onSuccess: () => {

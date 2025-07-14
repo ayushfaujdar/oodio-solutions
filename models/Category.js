@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
@@ -7,5 +7,4 @@ const categorySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const Category = mongoose.model('Category', categorySchema);
-export default Category; 
+export default mongoose.model('Category', categorySchema); 

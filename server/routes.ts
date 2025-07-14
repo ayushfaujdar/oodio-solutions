@@ -11,9 +11,9 @@ import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
-  cloud_name: "do4bc9bdd",
-  api_key: "156694195619632",
-  api_secret: "0kKzlLSbhb182zpMfLzyE6NeDYw"
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Create uploads directory if it doesn't exist
@@ -113,11 +113,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error creating category:', error);
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: 'Invalid data', errors: error.errors });
-      } else if (typeof error === 'object' && error !== null && 'code' in error && (error as any).code === 11000) { // MongoDB duplicate key error
-        res.status(400).json({ message: 'Category name already exists.' });
       } else {
-        const errorMessage = typeof error === 'object' && error && 'message' in error ? (error as any).message : 'Unknown error';
-        res.status(500).json({ message: 'Failed to create category', error: errorMessage });
+        res.status(500).json({ message: 'Failed to create category' });
       }
     }
   });
