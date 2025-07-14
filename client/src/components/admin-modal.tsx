@@ -146,6 +146,31 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         throw new Error('Failed to delete portfolio item');
       }
     },
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/portfolio"] });
+      
+      // Snapshot the previous value
+      const previousPortfolio = queryClient.getQueryData(["/api/portfolio"]);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(["/api/portfolio"], (old: any[]) => 
+        old?.filter(item => item._id !== id) ?? []
+      );
+      
+      return { previousPortfolio };
+    },
+    onError: (error: Error, _variables, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousPortfolio) {
+        queryClient.setQueryData(["/api/portfolio"], context.previousPortfolio);
+      }
+      toast({
+        title: "Error deleting portfolio item",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] });
       toast({
@@ -153,18 +178,20 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         description: "The portfolio item has been removed successfully.",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error deleting portfolio item",
-        description: error.message,
-        variant: "destructive",
-      });
+    onSettled: () => {
+      // Always refetch after error or success to ensure we're up to date
+      queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] });
     }
   });
 
   const addCategoryMutation = useMutation({
     mutationFn: async (data: CategoryFormData) => {
-      await apiRequest("POST", "/api/categories", data);
+      const response = await apiRequest("POST", "/api/categories", data);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create category');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
@@ -174,10 +201,12 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         description: "New category has been added successfully.",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "Error adding category",
-        description: error.message,
+        description: error.message === 'A category with this name already exists' 
+          ? "A category with this name already exists. Please use a different name."
+          : error.message,
         variant: "destructive",
       });
     }
@@ -195,6 +224,31 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         throw new Error('Failed to delete category');
       }
     },
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/categories"] });
+      
+      // Snapshot the previous value
+      const previousCategories = queryClient.getQueryData(["/api/categories"]);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(["/api/categories"], (old: any[]) => 
+        old?.filter(category => category._id !== id) ?? []
+      );
+      
+      return { previousCategories };
+    },
+    onError: (error: Error, _variables, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousCategories) {
+        queryClient.setQueryData(["/api/categories"], context.previousCategories);
+      }
+      toast({
+        title: "Error deleting category",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       toast({
@@ -202,12 +256,9 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         description: "The category has been removed successfully.",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error deleting category",
-        description: error.message,
-        variant: "destructive",
-      });
+    onSettled: () => {
+      // Always refetch after error or success to ensure we're up to date
+      queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
     }
   });
 
@@ -517,11 +568,15 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                               </div>
                               <Button
                                 onClick={() => handleDeletePortfolio(item._id)}
-                                disabled={deletePortfolioMutation.isPending}
+                                disabled={deletePortfolioMutation.isPending || deletePortfolioMutation.variables === item._id}
                                 variant="destructive"
                                 size="sm"
                               >
-                                <Trash2 size={16} />
+                                {deletePortfolioMutation.isPending && deletePortfolioMutation.variables === item._id ? (
+                                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                ) : (
+                                  <Trash2 size={16} />
+                                )}
                               </Button>
                             </div>
                           ))
@@ -634,11 +689,15 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                               </div>
                               <Button
                                 onClick={() => handleDeleteCategory(category._id)}
-                                disabled={deleteCategoryMutation.isPending}
+                                disabled={deleteCategoryMutation.isPending || deleteCategoryMutation.variables === category._id}
                                 variant="destructive"
                                 size="sm"
                               >
-                                <Trash2 size={16} />
+                                {deleteCategoryMutation.isPending && deleteCategoryMutation.variables === category._id ? (
+                                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                ) : (
+                                  <Trash2 size={16} />
+                                )}
                               </Button>
                             </div>
                           ))
