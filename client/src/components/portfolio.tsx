@@ -5,13 +5,8 @@ import { usePortfolio } from "@/hooks/use-portfolio";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { PlayCircle } from "lucide-react";
-
-const categories = [
-  { id: "all", label: "All Work" },
-  { id: "video", label: "Video Editing" },
-  { id: "content", label: "Content Writing" },
-  { id: "design", label: "Thumbnail Design" }
-];
+import { apiRequest } from "@/lib/queryClient";
+import type { Category } from "@shared/schema";
 
 export default function Portfolio() {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -19,17 +14,27 @@ export default function Portfolio() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<{ url: string; type: "image" | "video"; title: string } | null>(null);
 
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['/api/categories'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/categories');
+      const data = await response.json();
+      return data;
+    }
+  });
+
+  // Add "All Work" to categories
+  const allCategories = [
+    { _id: "all", name: "all", displayName: "All Work", color: "blue" },
+    ...(Array.isArray(categories) ? categories : [])
+  ];
+
   const filteredItems = portfolioItems?.filter(item => 
     activeFilter === "all" || item.category === activeFilter
   ) || [];
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "video": return "cyan";
-      case "content": return "purple";
-      case "design": return "blue";
-      default: return "cyan";
-    }
+  const getCategoryColor = (category: Category) => {
+    return category.color || "cyan";
   };
 
   const handleItemClick = (item: any) => {
@@ -62,19 +67,25 @@ export default function Portfolio() {
 
         {/* Portfolio Filter */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category.id}
-              onClick={() => setActiveFilter(category.id)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                activeFilter === category.id
-                  ? "btn-gradient"
-                  : "glass-effect glass-hover"
-              }`}
-            >
-              {category.label}
-            </Button>
-          ))}
+          {categoriesLoading ? (
+            <div className="w-full text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+            </div>
+          ) : (
+            allCategories.map((category) => (
+              <Button
+                key={category._id}
+                onClick={() => setActiveFilter(category.name)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                  activeFilter === category.name
+                    ? "btn-gradient"
+                    : "glass-effect glass-hover"
+                }`}
+              >
+                {category.displayName}
+              </Button>
+            ))
+          )}
         </div>
 
         {/* Portfolio Grid */}
@@ -91,11 +102,11 @@ export default function Portfolio() {
           ) : (
             <AnimatePresence>
               {filteredItems.map((item) => {
-                const color = getCategoryColor(item.category);
+                const category = categories.find((c: Category) => c.name === item.category) || { color: "cyan" };
                 const isVideo = /\.(mp4|mov|avi)$/i.test(item.image);
                 return (
                   <motion.div
-                    key={`${item.id}-${activeFilter}`}
+                    key={`${item._id}-${activeFilter}`}
                     className="portfolio-item"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -138,7 +149,7 @@ export default function Portfolio() {
                           {item.description}
                         </p>
                         <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full glass-effect">
-                          <span className="text-xs font-medium text-cyan-400">
+                          <span className={`text-xs font-medium text-${category.color}-400`}>
                             {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
                           </span>
                         </div>
